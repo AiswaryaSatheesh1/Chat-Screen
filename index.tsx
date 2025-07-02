@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  View,
+} from 'react-native';
+
 import ChatBubble from '../components/ChatBubble';
 import ChatHeader from '../components/ChatHeader';
 import ChatInput from '../components/ChatInput';
@@ -29,20 +37,28 @@ export default function ChatPage() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <ChatHeader />
-      <FlatList
-        data={[...messages].reverse()}
-        renderItem={({ item }) => <ChatBubble item={item} />}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
-        onEndReached={loadMessages}
-        onEndReachedThreshold={0.2}
-        inverted
-        contentContainerStyle={{ paddingBottom: 100 }}
-        ListFooterComponent={loading ? <ActivityIndicator /> : null}
-      />
-      <ChatInput />
-    </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      
+    >
+      <View style={styles.container}>
+        <ChatHeader />
+
+        <FlatList
+          data={[...messages].reverse()}
+          renderItem={({ item }) => <ChatBubble item={item} />}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          onEndReached={loadMessages}
+          onEndReachedThreshold={0.2}
+          inverted
+          contentContainerStyle={styles.chatContent}
+          ListFooterComponent={loading ? <ActivityIndicator /> : null}
+        />
+
+        <ChatInput />
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -50,5 +66,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  chatContent: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 0, 
   },
 });
